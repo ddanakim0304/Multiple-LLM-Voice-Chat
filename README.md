@@ -16,3 +16,7 @@ This project is a voice-activated chat interface built with React, TypeScript, a
 
 ## Requirements
 Local LLaMA Instance: This project currently requires a local LLaMA instance running on http://localhost:11434 to function properly. If you do not have a local LLaMA setup, you will need to remove or modify the LLaMA integration in the code. The project will still function using GPT-3 and GPT-4 models via the OpenAI API.
+# Multiple-LLM-Chatbot
+# Multiple-LLM-Voice-Chat
+# Multiple-LLM-Voice-Chat
+# Multiple-LLM-Voice-Chat
