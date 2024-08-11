@@ -5,17 +5,10 @@ import { Ollama } from "@langchain/community/llms/ollama";
 
 dotenv.config();
 
-// define the response data structure
-interface ResponseData {
-    data: string;
-    contentType: string;
-    model: string;
-}
-
 // setup OpenAI instance
 const openai = new OpenAI();
 
-async function createAudio(fullMessage: string, voice: "echo" | "nova" | "fable"){
+async function createAudio(fullMessage: string, voice: "echo" | "nova" | "fable") {
     const mp3 = await openai.audio.speech.create({
         model: "tts-1",
         voice: voice,
@@ -25,24 +18,17 @@ async function createAudio(fullMessage: string, voice: "echo" | "nova" | "fable"
     return buffer.toString("base64");
 }
 
-
 // HTTP POST handler
-
-// export: function available for use outside the module
-// async: function is asynchronous (waits for the response)
-// promise:  returns a promise that will eventually resolve to a ResponseData type
-// "I promise to give you a ResponseData when I’m done, but you might have to wait a bit."
-export async function POST(req: Request, res: Response): Promise<ResponseData> {
+export async function POST(req: Request): Promise<Response> {
     const body = await req.json();
     let message = body.message.toLowerCase();
-    let modelName = body.model|| "gpt4";
+    let modelName = body.model || "gpt4";
 
     // function to remove the first word of a string (used to remove model name)
     const removeFirstWord = (text: string) => text.includes(" ") ? text.substring(text.indexOf(" ") + 1) : "";
     message = removeFirstWord(message);
 
     // initialize variable for message and audio
-    // base64Audio will store the audio version of the response
     let introMessage = "", base64Audio, voice: "echo" | "nova" | "fable" = "echo", gptMessage, fullMessage;
 
     // common prompt for all models
@@ -76,7 +62,9 @@ export async function POST(req: Request, res: Response): Promise<ResponseData> {
     // compile the full message
     fullMessage = introMessage + gptMessage;
     base64Audio = await createAudio(fullMessage, voice);
-    
 
-    return Response.json({ data: base64Audio, contentType: 'audio/mp3', model: modelName });
+    // Return a proper Response object
+    return new Response(JSON.stringify({ data: base64Audio, contentType: 'audio/mp3', model: modelName }), {
+        headers: { 'Content-Type': 'application/json' },
+    });
 }
